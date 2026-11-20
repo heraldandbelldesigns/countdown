@@ -64,6 +64,11 @@ input:focus,select:focus,button:focus-visible,summary:focus-visible{outline:2px 
 .check{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;margin:8px 0 0;white-space:normal;cursor:pointer}
 .check input{width:auto;height:auto;accent-color:var(--accent)}
 [hidden]{display:none!important}
+#loadBox{border:1px dashed var(--line);border-radius:4px;padding:12px 14px;background:var(--field)}
+#loadBox summary{cursor:pointer;font-size:13px;font-weight:600;letter-spacing:.02em}
+#loadBox[open] summary{margin-bottom:12px}
+.editbox{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.editbox h2{font-size:20px}
 .words{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .words:has(#lbSWrap[hidden]){grid-template-columns:repeat(3,1fr)}
 @media (max-width:480px){.words,.words:has(#lbSWrap[hidden]){grid-template-columns:1fr 1fr}}
@@ -104,6 +109,8 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
 #view .u{display:flex;flex-direction:column;align-items:center;min-width:calc(var(--fs)*1.75)}
 #view .n{color:var(--num);font-size:var(--fs);line-height:1;font-variant-numeric:lining-nums tabular-nums}
 #view .l{color:var(--lab);font-family:Montserrat,Arial,sans-serif;font-weight:500;font-size:max(8px,calc(var(--fs)*.21));letter-spacing:.18em;text-transform:uppercase;margin-top:calc(var(--fs)*.2);padding-left:.2em}
+#view.dots .units{gap:calc(var(--fs)*.14);align-items:flex-start}
+#view .sep{color:var(--num);font-size:calc(var(--fs)*.8);line-height:1.1}
 #view.box .u{border:1px solid var(--lab);border-radius:calc(var(--fs)*.08);padding:calc(var(--fs)*.22) calc(var(--fs)*.18)}
 #view.line .units{gap:0}
 #view.line .u{padding:0 calc(var(--fs)*.32)}
@@ -130,6 +137,13 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
 
   <div class="card">
     <form id="f" autocomplete="off" onsubmit="return false">
+      <details id="loadBox">
+        <summary>Changing a countdown you made before?</summary>
+        <label for="loadLink">Paste your edit link or countdown link</label>
+        <input id="loadLink" type="url" placeholder="https://heraldandbelldesigns.github.io/countdown/?t=…">
+        <p class="help" id="loadMsg" role="status">Your choices fill in below, so you only change what you need.</p>
+      </details>
+
       <div class="row">
         <div>
           <label for="date">Wedding date</label>
@@ -169,7 +183,7 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
       <div>
         <span class="lbl" id="styleLbl">Style</span>
         <div class="seg" role="radiogroup" aria-labelledby="styleLbl">
-          <label><input type="radio" name="style" value="plain" checked> Plain</label>
+          <label><input type="radio" name="style" value="dots" checked> Dots <span class="hint">12 : 30</span></label>
           <label><input type="radio" name="style" value="line"> Lines between</label>
           <label><input type="radio" name="style" value="box"> Boxes</label>
         </div>
@@ -233,6 +247,16 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
         <a class="btn ghost" id="test" target="_blank" rel="noopener">Open countdown</a>
       </div>
       <div class="status" id="status" role="status"></div>
+
+      <div class="editbox">
+        <h2>Your edit link</h2>
+        <p class="summary">Save this link: email it to yourself or bookmark it. Open it any time to change your countdown without starting again.</p>
+        <div class="link" id="editLink"></div>
+        <div class="actions">
+          <button class="ghost" id="copyEdit" type="button">Copy edit link</button>
+        </div>
+        <div class="status" id="status2" role="status"></div>
+      </div>
     </div>
   </div>
 
@@ -243,6 +267,12 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
       <li>In Canva, click the old countdown once and press <strong>Delete</strong>.</li>
       <li>Click an empty spot on the same page, then paste: <strong>Ctrl+V</strong> (or <strong>⌘+V</strong> on a Mac).</li>
       <li>Your countdown appears. Drag it into place and resize it from a corner.</li>
+    </ol>
+    <h3 style="margin-top:22px">How to change it later</h3>
+    <ol>
+      <li>Open your <strong>edit link</strong>. Your choices are already filled in.</li>
+      <li>Make your changes and click <strong>Copy link</strong>.</li>
+      <li>In Canva, delete the old countdown and add the new link the same way as before, then publish your website again.</li>
     </ol>
   </section>
   <p class="note">The countdown runs to the wedding moment in the time zone you chose, so it’s right for guests anywhere. Want to change something later? Make a new link here and swap it in.</p>
@@ -281,7 +311,7 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
   }
 
   /* ================= COUNTDOWN VIEW ================= */
-  if (params.has("t")) {
+  if (params.has("t") && !params.has("edit")) {
     document.documentElement.classList.add("view");
     var view = $("view"); view.hidden = false;
     var tz = validTz(params.get("z")) ? params.get("z") : "UTC";
@@ -290,7 +320,8 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
     $("fontCss").href = "https://fonts.googleapis.com/css2?family=" + FONTS[font].css + "&family=Montserrat:wght@500&display=swap";
     view.style.fontFamily = FONTS[font].family;
     view.classList.add("f-" + font);
-    var st = params.get("st"); if (st === "box" || st === "line") view.classList.add(st);
+    var st = params.get("st"); if (st !== "box" && st !== "line") st = "dots";
+    view.classList.add(st);
     if (HEX.test(params.get("c")))  view.style.setProperty("--num", "#" + params.get("c"));
     if (HEX.test(params.get("lc"))) view.style.setProperty("--lab", "#" + params.get("lc"));
     if (HEX.test(params.get("bg"))) { document.body.style.background = "#" + params.get("bg"); document.documentElement.style.background = "#" + params.get("bg"); }
@@ -300,6 +331,10 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
     var count = showSec ? 4 : 3;
     var nums = [];
     for (var i = 0; i < count; i++) {
+      if (i > 0 && st === "dots") {
+        var sp = document.createElement("span"); sp.className = "sep"; sp.textContent = ":"; sp.setAttribute("aria-hidden", "true");
+        $("vUnits").appendChild(sp);
+      }
       var u = document.createElement("div"); u.className = "u";
       var n = document.createElement("span"); n.className = "n"; n.textContent = "00";
       var l = document.createElement("span"); l.className = "l"; l.textContent = names[i];
@@ -310,7 +345,8 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
     function fit(){
       var W = window.innerWidth, H = window.innerHeight;
       var rows = 1.6 + (st === "box" ? 0.5 : 0);
-      var fs = Math.min(W * 0.92 / (count * 2.1 + 0.2), H * 0.86 / rows);
+      var across = count * 2.1 + 0.2 + (st === "dots" ? (count - 1) * 0.55 : 0);
+      var fs = Math.min(W * 0.92 / across, H * 0.86 / rows);
       view.style.setProperty("--fs", Math.max(10, fs) + "px");
     }
     function pad(x){ return x < 10 ? "0" + x : String(x); }
@@ -480,13 +516,14 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
 
   function radio(name){ return document.querySelector('input[name="'+name+'"]:checked').value; }
 
-  var current = "", frameTimer = null;
+  var current = "", editLink = "", frameTimer = null;
   function build(){
     $("lbSWrap").hidden = radio("sec")==="0";
     var date=$("date").value, time=timeValue();
     var status=$("status"); status.textContent=""; status.className="status";
     if(!date || !chosen){
-      current=""; $("link").textContent="Your link appears here once you choose the wedding date.";
+      current=""; editLink=""; $("link").textContent="Your link appears here once you choose the wedding date.";
+      $("editLink").textContent="Your edit link appears here too.";
       $("summary").textContent=""; $("test").removeAttribute("href");
       var fr=$("preview").querySelector("iframe"); if(fr) fr.remove(); $("previewEmpty").hidden=false;
       return;
@@ -495,7 +532,7 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
     q.set("t", time ? date+"T"+time : date);
     q.set("z", chosen.tz);
     var f=radio("font"); if(f!=="cg") q.set("f", f);
-    var st=radio("style"); if(st!=="plain") q.set("st", st);
+    var st=radio("style"); if(st!=="dots") q.set("st", st);
     if(radio("sec")==="0") q.set("s","0");
     var c=$("numC").value.slice(1).toLowerCase(), lc=$("labC").value.slice(1).toLowerCase();
     if(c!=="3b302a") q.set("c", c);
@@ -507,6 +544,9 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
     current = location.href.split(/[?#]/)[0] + "?" + q.toString().replace(/%2F/g,"/").replace(/%3A/g,":");
     $("link").textContent = current;
     $("test").href = current;
+    editLink = current + "&edit=1";
+    $("editLink").textContent = editLink;
+    $("status2").textContent = "";
 
     var when = zonedToUtc(q.get("t"), chosen.tz);
     var p = date.split("-").map(Number);
@@ -524,24 +564,67 @@ html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transpa
     }, 250);
   }
 
-  $("copy").addEventListener("click", function(){
-    var status=$("status");
-    if(!current){ status.textContent="Choose the wedding date first."; status.className="status error"; return; }
-    function done(){ status.textContent="Copied. Now paste it into Canva."; status.className="status"; }
+  function copyText(text, box, status, doneMsg){
+    if(!text){ status.textContent="Choose the wedding date first."; status.className="status error"; return; }
+    function done(){ status.textContent=doneMsg; status.className="status"; }
     function manual(){
-      var r=document.createRange(); r.selectNodeContents($("link"));
+      var r=document.createRange(); r.selectNodeContents(box);
       var sl=window.getSelection(); sl.removeAllRanges(); sl.addRange(r);
       try{ if(document.execCommand("copy")){ done(); return; } }catch(e){}
       status.textContent="Link selected — press Ctrl+C (or ⌘+C) to copy."; status.className="status";
     }
-    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(current).then(done, manual);
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, manual);
     else manual();
+  }
+  $("copy").addEventListener("click", function(){ copyText(current, $("link"), $("status"), "Copied. Now paste it into Canva."); });
+  $("copyEdit").addEventListener("click", function(){ copyText(editLink, $("editLink"), $("status2"), "Copied. Save it somewhere safe, like an email to yourself."); });
+
+  // ---- Fill the form back in from a countdown link or edit link ----
+  function setRadio(name, value){ var r=document.querySelector('input[name="'+name+'"][value="'+value+'"]'); if(r) r.checked=true; }
+  function setColor(pick, text, hex){ $(pick).value="#"+hex.toLowerCase(); $(text).value="#"+hex.toUpperCase(); }
+  function fillFrom(sp){
+    var m=/^(\d{4}-\d{2}-\d{2})(?:T(\d{2}):(\d{2}))?$/.exec(sp.get("t")||"");
+    if(!m) return false;
+    $("date").value=m[1];
+    if(m[2]){
+      var hh=+m[2];
+      if(h12){ $("timeH").value=String(hh%12||12); $("timeAP").value= hh>=12 ? "PM":"AM"; }
+      else $("timeH").value=pad(hh);
+      if(![].some.call($("timeM").options,function(o){return o.value===m[3];})) opt($("timeM"), m[3], m[3]);
+      $("timeM").value=m[3];
+    } else { $("timeH").value=""; $("timeM").value=""; }
+    var z=sp.get("z");
+    if(z && validTz(z)){
+      var e=entries.filter(function(x){return x.tz===z;})[0];
+      if(!e){ e={label:z.replace(/_/g," "), tz:z, hay:norm(z), popular:false}; entries.push(e); }
+      chosen=e; input.value=e.label;
+    }
+    setRadio("font", FONTS[sp.get("f")] ? sp.get("f") : "cg");
+    setRadio("style", (sp.get("st")==="box"||sp.get("st")==="line") ? sp.get("st") : "dots");
+    setRadio("sec", sp.get("s")==="0" ? "0" : "1");
+    setColor("numC","numT", HEX.test(sp.get("c")||"") ? sp.get("c") : "3b302a");
+    setColor("labC","labT", HEX.test(sp.get("lc")||"") ? sp.get("lc") : "7a6d64");
+    var bg=sp.get("bg")||"", hasBg=HEX.test(bg);
+    $("bgNone").checked=!hasBg; if(hasBg) setColor("bgC","bgT",bg);
+    $("bgC").disabled=$("bgT").disabled=!hasBg;
+    var w=(sp.get("lb")||"").split("|");
+    ["lbD","lbH","lbM","lbS"].forEach(function(id,i){ $(id).value=w[i]||""; });
+    build();
+    return true;
+  }
+  $("loadLink").addEventListener("input", function(){
+    var v=$("loadLink").value.trim(), msg=$("loadMsg");
+    if(!v){ msg.textContent="Your choices fill in below, so you only change what you need."; msg.className="help"; return; }
+    var ok=false; try{ ok=fillFrom(new URL(v).searchParams); }catch(e){}
+    msg.textContent = ok ? "Done. Your countdown is filled in below. Make your changes, then copy the new link." : "That doesn't look like a countdown link. Check you copied all of it.";
+    msg.className = ok ? "help" : "help error";
   });
 
-  document.querySelectorAll("#f input:not(#tzSearch), #f select").forEach(function(el){
+  document.querySelectorAll("#f input:not(#tzSearch):not(#loadLink), #f select").forEach(function(el){
     el.addEventListener("input", build); el.addEventListener("change", build);
   });
-  build();
+  if (params.has("edit") && fillFrom(params)) { $("loadBox").open = false; }
+  else build();
 })();
 </script>
 </body>
