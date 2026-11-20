@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wedding Countdown Maker</title>
+<meta name="description" content="Make a free countdown to your wedding day and add it to your Canva wedding website.">
+<meta property="og:title" content="Wedding Countdown">
+<!-- Asks embed services (like the one Canva uses) to show this page, with its settings, as a live frame -->
+<link rel="iframely player" href="#countdown" media="(aspect-ratio: 3/1)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link id="fontCss" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Marcellus&family=Montserrat:wght@400;500;600&family=Playfair+Display:wght@400&display=swap">
+<style>
+body{margin:0}
+:root{
+  --bg:#f3f0ec; --card:#fbfaf8; --ink:#3b302a; --muted:#7a6d64; --line:#ddd4cc;
+  --accent:#6b4f3f; --accent-ink:#fbfaf8; --field:#ffffff; --ok:#4f6b52; --focus:#b08d74;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1f1b19; --card:#2a2522; --ink:#efe8e2; --muted:#b3a79e; --line:#433b36;
+    --accent:#d2b49f; --accent-ink:#2a2522; --field:#231f1d; --ok:#9fc2a2; --focus:#d2b49f;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1f1b19; --card:#2a2522; --ink:#efe8e2; --muted:#b3a79e; --line:#433b36;
+  --accent:#d2b49f; --accent-ink:#2a2522; --field:#231f1d; --ok:#9fc2a2; --focus:#d2b49f;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:Montserrat,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:620px;margin:0 auto;padding-inline:16px;padding-block:40px 64px}
+header{text-align:center;margin-bottom:28px}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(34px,7vw,46px);line-height:1.1;margin:8px 0 10px;text-wrap:balance}
+.lede{color:var(--muted);max-width:46ch;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:24px}
+form{display:grid;gap:18px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.row{grid-template-columns:1fr}}
+label{display:block;font-size:12px;font-weight:600;letter-spacing:.04em;margin-bottom:6px;white-space:nowrap}
+.hint{font-weight:400;color:var(--muted);letter-spacing:0}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:4px;padding:10px 12px;height:46px;line-height:1.2}
+input:focus,select:focus,button:focus-visible,summary:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.lbl{display:block;font-size:12px;font-weight:600;letter-spacing:.04em;margin-bottom:6px}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg label{display:flex;align-items:center;gap:8px;margin:0;font-size:13px;font-weight:500;letter-spacing:0;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:var(--field);cursor:pointer;white-space:normal}
+.seg label:has(input:checked){border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.seg input{width:auto;height:auto;margin:0;padding:0;accent-color:var(--accent)}
+.f-cg{font-family:"Cormorant Garamond",Georgia,serif;font-size:17px}
+.f-pf{font-family:"Playfair Display",Georgia,serif}
+.f-mo{font-family:Montserrat,Arial,sans-serif}
+.tp{display:flex;align-items:center;gap:6px}
+.tp select{flex:1 1 0;min-width:0;padding-inline:8px 2px;font-size:14px}
+.tp select#timeAP{flex:0 0 64px}
+.colon{font-weight:600;color:var(--muted)}
+.help{margin:6px 0 0;font-size:12px;color:var(--muted)}
+.colors{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:480px){.colors{grid-template-columns:1fr}}
+.colorpick{display:flex;align-items:center;gap:8px}
+.colorpick input[type=color]{width:46px;flex:0 0 46px;padding:3px;cursor:pointer}
+.colorpick input[type=text]{font-family:ui-monospace,Menlo,monospace;font-size:13px;text-transform:uppercase;min-width:0}
+.colorpick input:disabled{opacity:.45}
+.check{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;margin:8px 0 0;white-space:normal;cursor:pointer}
+.check input{width:auto;height:auto;accent-color:var(--accent)}
+[hidden]{display:none!important}
+.words{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.words:has(#lbSWrap[hidden]){grid-template-columns:repeat(3,1fr)}
+@media (max-width:480px){.words,.words:has(#lbSWrap[hidden]){grid-template-columns:1fr 1fr}}
+label.sub{font-weight:500;color:var(--muted);font-size:11px}
+.f-ma{font-family:Marcellus,Georgia,serif}
+.combo{position:relative}
+#tzList{position:absolute;z-index:10;left:0;right:0;top:100%;margin:4px 0 0;padding:4px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:4px;max-height:280px;overflow:auto;box-shadow:0 10px 28px rgba(40,25,15,.14)}
+#tzList li{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:9px 10px;border-radius:3px;cursor:pointer}
+#tzList li[aria-selected="true"],#tzList li:hover{background:var(--bg)}
+#tzList .off{color:var(--muted);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+#tzList .empty{color:var(--muted);cursor:default}
+.result{margin-top:24px;border-top:1px solid var(--line);padding-top:20px}
+.result h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:24px;margin:0 0 4px}
+.summary{color:var(--muted);font-size:13px;margin:0 0 12px}
+.preview{position:relative;aspect-ratio:3/1;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:14px;
+  background-color:#fff;background-image:linear-gradient(45deg,#eee 25%,transparent 25%,transparent 75%,#eee 75%),linear-gradient(45deg,#eee 25%,transparent 25%,transparent 75%,#eee 75%);background-size:16px 16px;background-position:0 0,8px 8px}
+.preview iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+.preview .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7a6d64;font-size:13px;padding:16px;text-align:center;background:#fbfaf8}
+.link{font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all;background:var(--field);border:1px dashed var(--line);border-radius:4px;padding:12px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+button,.btn{font:inherit;font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+.primary{background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent)}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.status{font-size:13px;color:var(--ok);min-height:1.2em;margin-top:8px}
+.error{color:#b04a3a}
+.steps{margin-top:28px}
+.steps h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:22px;margin:0 0 10px;text-align:center}
+.steps ol{margin:0;padding-left:20px;display:grid;gap:8px}
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:22px}
+.legal{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);text-align:center;font-size:11px;line-height:1.6;color:var(--muted)}
+.legal p{margin:0}
+
+/* ---------- The countdown itself (what shows inside Canva) ---------- */
+html.view,html.view body{height:100%;margin:0;overflow:hidden;background:transparent}
+#view{height:100vh;width:100vw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  --fs:40px; --num:#3b302a; --lab:#7a6d64; font-family:"Cormorant Garamond",Georgia,serif}
+#view .units{display:flex;justify-content:center;gap:calc(var(--fs)*.32)}
+#view .u{display:flex;flex-direction:column;align-items:center;min-width:calc(var(--fs)*1.75)}
+#view .n{color:var(--num);font-size:var(--fs);line-height:1;font-variant-numeric:lining-nums tabular-nums}
+#view .l{color:var(--lab);font-family:Montserrat,Arial,sans-serif;font-weight:500;font-size:max(8px,calc(var(--fs)*.21));letter-spacing:.18em;text-transform:uppercase;margin-top:calc(var(--fs)*.2);padding-left:.2em}
+#view.box .u{border:1px solid var(--lab);border-radius:calc(var(--fs)*.08);padding:calc(var(--fs)*.22) calc(var(--fs)*.18)}
+#view.line .units{gap:0}
+#view.line .u{padding:0 calc(var(--fs)*.32)}
+#view.line .u+.u{border-left:1px solid var(--lab)}
+#view .done{color:var(--num);font-size:calc(var(--fs)*.75);line-height:1.15;padding:0 4vw}
+#view.f-cg .n{font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- ============ The countdown (shown when the link has settings) ============ -->
+<div id="view" hidden aria-live="off">
+  <div class="units" id="vUnits"></div>
+  <div class="done" id="vDone" hidden></div>
+</div>
+
+<!-- ============ The maker (shown on the plain page) ============ -->
+<div class="wrap" id="maker" hidden>
+  <header>
+    <div class="eyebrow">Herald &amp; Bell Designs</div>
+    <h1>Wedding Countdown Maker</h1>
+    <p class="lede">Choose your date and style. Copy your link. Paste it into Canva to add a live countdown to your website.</p>
+  </header>
+
+  <div class="card">
+    <form id="f" autocomplete="off" onsubmit="return false">
+      <div class="row">
+        <div>
+          <label for="date">Wedding date</label>
+          <input id="date" type="date" required>
+        </div>
+        <div>
+          <label for="timeH">Ceremony time <span class="hint">(optional)</span></label>
+          <div class="tp">
+            <select id="timeH" aria-label="Hour"></select>
+            <span class="colon" aria-hidden="true">:</span>
+            <select id="timeM" aria-label="Minutes"></select>
+            <select id="timeAP" aria-label="AM or PM"><option>AM</option><option>PM</option></select>
+          </div>
+          <p class="help">Leave blank to count down to the start of the day</p>
+        </div>
+      </div>
+
+      <div>
+        <label for="tzSearch">Time zone</label>
+        <div class="combo">
+          <input id="tzSearch" type="text" role="combobox" aria-expanded="false" aria-controls="tzList" aria-autocomplete="list" aria-describedby="tzHelp" placeholder="e.g. New York, London, Sydney">
+          <ul id="tzList" role="listbox" hidden></ul>
+        </div>
+        <p class="help" id="tzHelp">Type the wedding city or country, so every guest counts down to the same moment</p>
+      </div>
+
+      <div>
+        <span class="lbl" id="fontLbl">Number font</span>
+        <div class="seg" role="radiogroup" aria-labelledby="fontLbl">
+          <label><input type="radio" name="font" value="cg" checked> <span class="f-cg">Classic 0123</span></label>
+          <label><input type="radio" name="font" value="pf"> <span class="f-pf">Elegant 0123</span></label>
+          <label><input type="radio" name="font" value="ma"> <span class="f-ma">Timeless 0123</span></label>
+          <label><input type="radio" name="font" value="mo"> <span class="f-mo">Modern 0123</span></label>
+        </div>
+      </div>
+
+      <div>
+        <span class="lbl" id="styleLbl">Style</span>
+        <div class="seg" role="radiogroup" aria-labelledby="styleLbl">
+          <label><input type="radio" name="style" value="plain" checked> Plain</label>
+          <label><input type="radio" name="style" value="line"> Lines between</label>
+          <label><input type="radio" name="style" value="box"> Boxes</label>
+        </div>
+      </div>
+
+      <div>
+        <span class="lbl" id="secLbl">Show seconds</span>
+        <div class="seg" role="radiogroup" aria-labelledby="secLbl">
+          <label><input type="radio" name="sec" value="1" checked> Yes</label>
+          <label><input type="radio" name="sec" value="0"> No <span class="hint">days, hours, minutes</span></label>
+        </div>
+      </div>
+
+      <div class="colors">
+        <div>
+          <label for="numC">Number colour</label>
+          <div class="colorpick">
+            <input type="color" id="numC" value="#3b302a" aria-label="Number colour picker">
+            <input type="text" id="numT" value="#3B302A" maxlength="7" aria-label="Number colour code">
+          </div>
+        </div>
+        <div>
+          <label for="labC">Label colour</label>
+          <div class="colorpick">
+            <input type="color" id="labC" value="#7a6d64" aria-label="Label colour picker">
+            <input type="text" id="labT" value="#7A6D64" maxlength="7" aria-label="Label colour code">
+          </div>
+        </div>
+        <div>
+          <label for="bgC">Background</label>
+          <div class="colorpick">
+            <input type="color" id="bgC" value="#fbf7f1" aria-label="Background colour picker" disabled>
+            <input type="text" id="bgT" value="#FBF7F1" maxlength="7" aria-label="Background colour code" disabled>
+          </div>
+          <label class="check"><input type="checkbox" id="bgNone" checked> See-through</label>
+        </div>
+      </div>
+      <p class="help" style="margin-top:-8px">Tip: in Canva, click a text on your website, then the colour square, to see its colour code (like #6B2E35). Type it here to match.</p>
+
+      <div>
+        <span class="lbl">Words under the numbers <span class="hint">(optional)</span></span>
+        <div class="words">
+          <div><label for="lbD" class="sub">Days</label><input id="lbD" placeholder="Days" maxlength="16"></div>
+          <div><label for="lbH" class="sub">Hours</label><input id="lbH" placeholder="Hours" maxlength="16"></div>
+          <div><label for="lbM" class="sub">Minutes</label><input id="lbM" placeholder="Minutes" maxlength="16"></div>
+          <div id="lbSWrap"><label for="lbS" class="sub">Seconds</label><input id="lbS" placeholder="Seconds" maxlength="16"></div>
+        </div>
+        <p class="help">Leave blank to keep the English words, or type your own, e.g. Días, Horas, Minutos, Segundos</p>
+      </div>
+    </form>
+
+    <div class="result">
+      <h2>Your countdown</h2>
+      <p class="summary" id="summary"></p>
+      <div class="preview" id="preview">
+        <div class="empty" id="previewEmpty">Your countdown appears here once you choose the wedding date.</div>
+      </div>
+      <div class="link" id="link"></div>
+      <div class="actions">
+        <button class="primary" id="copy" type="button">Copy link</button>
+        <a class="btn ghost" id="test" target="_blank" rel="noopener">Open countdown</a>
+      </div>
+      <div class="status" id="status" role="status"></div>
+    </div>
+  </div>
+
+  <section class="steps">
+    <h3>How to add it in Canva</h3>
+    <ol>
+      <li>Click <strong>Copy link</strong> above.</li>
+      <li>In Canva, click the old countdown once and press <strong>Delete</strong>.</li>
+      <li>Click an empty spot on the same page, then paste: <strong>Ctrl+V</strong> (or <strong>⌘+V</strong> on a Mac).</li>
+      <li>Your countdown appears. Drag it into place and resize it from a corner.</li>
+    </ol>
+  </section>
+  <p class="note">The countdown runs to the wedding moment in the time zone you chose, so it’s right for guests anywhere. Want to change something later? Make a new link here and swap it in.</p>
+  <footer class="legal">
+    <p>© 2026 Herald &amp; Bell Designs</p>
+    <p>Your details stay in your link and your browser. Nothing is stored or shared.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){return document.getElementById(id);};
+  var params = new URLSearchParams(location.search);
+  var HEX = /^[0-9a-f]{6}$/i;
+  var FONTS = {
+    cg: {css:"Cormorant+Garamond:wght@600",  family:'"Cormorant Garamond",Georgia,serif'},
+    pf: {css:"Playfair+Display:wght@400",     family:'"Playfair Display",Georgia,serif'},
+    ma: {css:"Marcellus",                     family:'Marcellus,Georgia,serif'},
+    mo: {css:"Montserrat:wght@400",           family:'Montserrat,Arial,sans-serif'}
+  };
+  function validTz(z){ try{ new Intl.DateTimeFormat("en",{timeZone:z}); return true; }catch(e){ return false; } }
+
+  // Milliseconds the zone is ahead of UTC at a given moment
+  function tzOffset(ts, tz){
+    var p = {}; new Intl.DateTimeFormat("en-US",{timeZone:tz,hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"})
+      .formatToParts(new Date(ts)).forEach(function(x){ p[x.type]=x.value; });
+    return Date.UTC(+p.year, +p.month-1, +p.day, +p.hour % 24, +p.minute, +p.second) - Math.floor(ts/1000)*1000;
+  }
+  // "2027-06-12T16:00" in a time zone -> exact moment
+  function zonedToUtc(local, tz){
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?$/.exec(local || "");
+    if(!m) return NaN;
+    var guess = Date.UTC(+m[1], +m[2]-1, +m[3], +(m[4]||0), +(m[5]||0));
+    var t = guess - tzOffset(guess, tz);
+    return guess - tzOffset(t, tz);
+  }
+
+  /* ================= COUNTDOWN VIEW ================= */
+  if (params.has("t")) {
+    document.documentElement.classList.add("view");
+    var view = $("view"); view.hidden = false;
+    var tz = validTz(params.get("z")) ? params.get("z") : "UTC";
+    var target = zonedToUtc(params.get("t"), tz);
+    var font = FONTS[params.get("f")] ? params.get("f") : "cg";
+    $("fontCss").href = "https://fonts.googleapis.com/css2?family=" + FONTS[font].css + "&family=Montserrat:wght@500&display=swap";
+    view.style.fontFamily = FONTS[font].family;
+    view.classList.add("f-" + font);
+    var st = params.get("st"); if (st === "box" || st === "line") view.classList.add(st);
+    if (HEX.test(params.get("c")))  view.style.setProperty("--num", "#" + params.get("c"));
+    if (HEX.test(params.get("lc"))) view.style.setProperty("--lab", "#" + params.get("lc"));
+    if (HEX.test(params.get("bg"))) { document.body.style.background = "#" + params.get("bg"); document.documentElement.style.background = "#" + params.get("bg"); }
+    var words = (params.get("lb") || "").split("|");
+    var names = ["Days","Hours","Minutes","Seconds"].map(function(d,i){ return (words[i] || "").trim() || d; });
+    var showSec = params.get("s") !== "0";
+    var count = showSec ? 4 : 3;
+    var nums = [];
+    for (var i = 0; i < count; i++) {
+      var u = document.createElement("div"); u.className = "u";
+      var n = document.createElement("span"); n.className = "n"; n.textContent = "00";
+      var l = document.createElement("span"); l.className = "l"; l.textContent = names[i];
+      u.appendChild(n); u.appendChild(l); $("vUnits").appendChild(u); nums.push(n);
+    }
+    var doneMsg = "Today's the day!";
+
+    function fit(){
+      var W = window.innerWidth, H = window.innerHeight;
+      var rows = 1.6 + (st === "box" ? 0.5 : 0);
+      var fs = Math.min(W * 0.92 / (count * 2.1 + 0.2), H * 0.86 / rows);
+      view.style.setProperty("--fs", Math.max(10, fs) + "px");
+    }
+    function pad(x){ return x < 10 ? "0" + x : String(x); }
+    function tick(){
+      var left = target - Date.now();
+      if (isNaN(target)) { $("vUnits").hidden = true; $("vDone").hidden = false; $("vDone").textContent = "Countdown date missing"; return; }
+      if (left <= 0) {
+        $("vUnits").hidden = true; $("vDone").hidden = false; $("vDone").textContent = doneMsg; return;
+      }
+      var s = Math.floor(left / 1000);
+      var v = [Math.floor(s / 86400), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60];
+      for (var i = 0; i < count; i++) nums[i].textContent = i === 0 ? String(v[0]).padStart(2, "0") : pad(v[i]);
+      setTimeout(tick, 1000 - (Date.now() % 1000) + 5);
+    }
+    fit(); window.addEventListener("resize", fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    tick();
+    return;
+  }
+
+  /* ================= MAKER ================= */
+  $("maker").hidden = false;
+
+  // Popular wedding locations: [label, time zone, extra search words]
+  var POPULAR = [
+    ["New York (US Eastern)","America/New_York","usa us united states america east coast eastern est edt boston miami florida washington dc atlanta philadelphia new jersey"],
+    ["Chicago (US Central)","America/Chicago","usa us united states central cst cdt texas dallas houston austin nashville new orleans"],
+    ["Denver (US Mountain)","America/Denver","usa us united states mountain mst mdt colorado utah salt lake"],
+    ["Phoenix (Arizona)","America/Phoenix","usa us united states arizona scottsdale"],
+    ["Los Angeles (US Pacific)","America/Los_Angeles","usa us united states pacific pst pdt california san francisco san diego las vegas seattle portland napa"],
+    ["Honolulu (Hawaii)","Pacific/Honolulu","usa us hawaii maui hst"],
+    ["Toronto (Canada Eastern)","America/Toronto","canada montreal ottawa quebec eastern"],
+    ["Vancouver (Canada Pacific)","America/Vancouver","canada british columbia whistler pacific"],
+    ["Mexico City (Mexico)","America/Mexico_City","mexico"],
+    ["Cancún (Mexico)","America/Cancun","mexico cancun tulum riviera maya playa del carmen"],
+    ["London (UK)","Europe/London","uk united kingdom england scotland wales britain great gb gmt bst edinburgh manchester cotswolds"],
+    ["Dublin (Ireland)","Europe/Dublin","ireland irish"],
+    ["Paris (France)","Europe/Paris","france provence nice cet"],
+    ["Madrid / Barcelona (Spain)","Europe/Madrid","spain ibiza mallorca marbella seville"],
+    ["Rome / Florence (Italy)","Europe/Rome","italy tuscany amalfi lake como venice milan sicily"],
+    ["Lisbon (Portugal)","Europe/Lisbon","portugal algarve porto"],
+    ["Amsterdam (Netherlands)","Europe/Amsterdam","netherlands holland"],
+    ["Berlin (Germany)","Europe/Berlin","germany munich"],
+    ["Zurich (Switzerland)","Europe/Zurich","switzerland geneva"],
+    ["Athens (Greece)","Europe/Athens","greece santorini mykonos crete"],
+    ["Dubai (UAE)","Asia/Dubai","uae united arab emirates abu dhabi"],
+    ["Delhi / Mumbai (India)","Asia/Kolkata","india goa jaipur udaipur ist"],
+    ["Bangkok (Thailand)","Asia/Bangkok","thailand phuket koh samui"],
+    ["Bali (Indonesia)","Asia/Makassar","indonesia bali denpasar ubud"],
+    ["Singapore","Asia/Singapore","singapore"],
+    ["Hong Kong","Asia/Hong_Kong","hong kong hk"],
+    ["Tokyo (Japan)","Asia/Tokyo","japan kyoto osaka"],
+    ["Sydney (Australia)","Australia/Sydney","australia nsw aest"],
+    ["Melbourne (Australia)","Australia/Melbourne","australia victoria"],
+    ["Brisbane (Australia)","Australia/Brisbane","australia queensland gold coast"],
+    ["Perth (Australia)","Australia/Perth","australia western"],
+    ["Auckland (New Zealand)","Pacific/Auckland","new zealand nz queenstown wellington"],
+    ["Cape Town (South Africa)","Africa/Johannesburg","south africa johannesburg"],
+    ["São Paulo (Brazil)","America/Sao_Paulo","brazil rio de janeiro"]
+  ];
+
+  function norm(t){ return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[_/(),.-]+/g," ").replace(/\s+/g," ").trim(); }
+
+  var entries = POPULAR.map(function(p){ return {label:p[0], tz:p[1], hay:norm(p[0]+" "+p[1]+" "+p[2]), popular:true}; });
+  var known = {}; entries.forEach(function(e){ known[e.tz]=true; });
+  var all = []; try { all = Intl.supportedValuesOf("timeZone"); } catch(e){}
+  all.forEach(function(z){
+    if(known[z] || z.indexOf("/")<0) return;
+    var parts=z.split("/"), city=parts[parts.length-1].replace(/_/g," "), region=parts[0].replace(/_/g," ");
+    entries.push({label: city+" ("+region+")", tz:z, hay:norm(city+" "+z), popular:false});
+  });
+  entries.push({label:"UTC / GMT+0", tz:"UTC", hay:"utc gmt universal", popular:false});
+
+  function offset(tz){
+    try{
+      var d = $("date").value ? new Date($("date").value+"T12:00:00Z") : new Date();
+      var p = new Intl.DateTimeFormat("en-GB",{timeZone:tz,timeZoneName:"shortOffset"}).formatToParts(d);
+      for(var i=0;i<p.length;i++) if(p[i].type==="timeZoneName") return p[i].value;
+    }catch(e){}
+    return "";
+  }
+  function search(q){
+    var tokens = norm(q).split(" ").filter(Boolean);
+    if(!tokens.length) return entries.filter(function(e){return e.popular;});
+    var hits = entries.filter(function(e){ return tokens.every(function(t){ return e.hay.indexOf(t)>-1; }); });
+    hits.sort(function(a,b){
+      var as = norm(a.label).indexOf(tokens[0])===0, bs = norm(b.label).indexOf(tokens[0])===0;
+      if(a.popular!==b.popular) return a.popular?-1:1;
+      if(as!==bs) return as?-1:1;
+      return 0;
+    });
+    return hits.slice(0,10);
+  }
+
+  var input=$("tzSearch"), list=$("tzList");
+  var chosen=null, matches=[], active=0;
+  function choose(e){ chosen=e; input.value=e.label; close(); build(); }
+  function render(){
+    list.innerHTML="";
+    if(!matches.length){
+      var li=document.createElement("li"); li.className="empty"; li.textContent="No match — try the nearest big city or the country";
+      list.appendChild(li);
+    }
+    matches.forEach(function(e,i){
+      var li=document.createElement("li"); li.setAttribute("role","option"); li.id="tzopt"+i;
+      li.setAttribute("aria-selected", i===active ? "true":"false");
+      var l=document.createElement("span"); l.textContent=e.label;
+      var o=document.createElement("span"); o.className="off"; o.textContent=offset(e.tz);
+      li.appendChild(l); li.appendChild(o);
+      li.addEventListener("mousedown",function(ev){ ev.preventDefault(); choose(e); });
+      list.appendChild(li);
+    });
+    list.hidden=false; input.setAttribute("aria-expanded","true");
+    if(matches.length) input.setAttribute("aria-activedescendant","tzopt"+active);
+  }
+  function open(){ matches=search(input.value===(chosen&&chosen.label)?"":input.value); active=0; render(); }
+  function close(){ list.hidden=true; input.setAttribute("aria-expanded","false"); input.removeAttribute("aria-activedescendant"); }
+  input.addEventListener("focus", function(){ input.select(); open(); });
+  input.addEventListener("input", function(){ matches=search(input.value); active=0; render(); });
+  input.addEventListener("keydown", function(ev){
+    if(ev.key==="ArrowDown"){ ev.preventDefault(); if(list.hidden) open(); else if(matches.length){ active=(active+1)%matches.length; render(); } }
+    else if(ev.key==="ArrowUp"){ ev.preventDefault(); if(matches.length){ active=(active-1+matches.length)%matches.length; render(); } }
+    else if(ev.key==="Enter"){ ev.preventDefault(); if(matches[active]) choose(matches[active]); }
+    else if(ev.key==="Escape"){ close(); if(chosen) input.value=chosen.label; }
+  });
+  input.addEventListener("blur", function(){
+    if(!chosen || input.value!==chosen.label){
+      var best = input.value.trim() ? search(input.value)[0] : null;
+      if(best) chosen=best;
+      if(chosen) input.value=chosen.label;
+      build();
+    }
+    close();
+  });
+  var local; try { local = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){ local="Europe/London"; }
+  chosen = entries.filter(function(e){return e.tz===local;})[0] || entries.filter(function(e){return e.tz==="Europe/London";})[0];
+  input.value = chosen.label;
+
+  // ---- Time picker (12-hour if the customer's device uses it) ----
+  function pad(n){return String(n).padStart(2,"0");}
+  var h12 = false;
+  try { h12 = !!new Intl.DateTimeFormat(undefined,{hour:"numeric"}).resolvedOptions().hour12; } catch(e){}
+  function opt(sel, value, text){ var o=document.createElement("option"); o.value=value; o.textContent=text; sel.appendChild(o); }
+  opt($("timeH"), "", "Hour");
+  if (h12) { for (var i=1;i<=12;i++) opt($("timeH"), String(i), String(i)); $("timeAP").value="PM"; }
+  else { for (var j=0;j<24;j++) opt($("timeH"), pad(j), pad(j)); $("timeAP").hidden = true; }
+  opt($("timeM"), "", "Min");
+  for (var k=0;k<60;k+=5) opt($("timeM"), pad(k), pad(k));
+  function timeValue(){
+    var h=$("timeH").value; if(h==="") return "";
+    if($("timeM").value==="") $("timeM").value="00";
+    var hh=+h; if(h12){ hh=hh%12; if($("timeAP").value==="PM") hh+=12; }
+    return pad(hh)+":"+$("timeM").value;
+  }
+
+  // ---- Colours: picker and code box stay in step ----
+  function linkColor(pick, text){
+    $(pick).addEventListener("input", function(){ $(text).value = $(pick).value.toUpperCase(); build(); });
+    $(text).addEventListener("input", function(){
+      var v = $(text).value.trim().replace(/^#?/, "#");
+      if (/^#[0-9a-f]{6}$/i.test(v)) { $(pick).value = v.toLowerCase(); build(); }
+    });
+    $(text).addEventListener("blur", function(){ $(text).value = $(pick).value.toUpperCase(); });
+  }
+  linkColor("numC","numT"); linkColor("labC","labT"); linkColor("bgC","bgT");
+  $("bgNone").addEventListener("change", function(){ $("bgC").disabled = $("bgT").disabled = $("bgNone").checked; build(); });
+
+  function radio(name){ return document.querySelector('input[name="'+name+'"]:checked').value; }
+
+  var current = "", frameTimer = null;
+  function build(){
+    $("lbSWrap").hidden = radio("sec")==="0";
+    var date=$("date").value, time=timeValue();
+    var status=$("status"); status.textContent=""; status.className="status";
+    if(!date || !chosen){
+      current=""; $("link").textContent="Your link appears here once you choose the wedding date.";
+      $("summary").textContent=""; $("test").removeAttribute("href");
+      var fr=$("preview").querySelector("iframe"); if(fr) fr.remove(); $("previewEmpty").hidden=false;
+      return;
+    }
+    var q = new URLSearchParams();
+    q.set("t", time ? date+"T"+time : date);
+    q.set("z", chosen.tz);
+    var f=radio("font"); if(f!=="cg") q.set("f", f);
+    var st=radio("style"); if(st!=="plain") q.set("st", st);
+    if(radio("sec")==="0") q.set("s","0");
+    var c=$("numC").value.slice(1).toLowerCase(), lc=$("labC").value.slice(1).toLowerCase();
+    if(c!=="3b302a") q.set("c", c);
+    if(lc!=="7a6d64") q.set("lc", lc);
+    if(!$("bgNone").checked) q.set("bg", $("bgC").value.slice(1).toLowerCase());
+    var lb=["lbD","lbH","lbM","lbS"].map(function(id){ return $(id).value.trim().replace(/\|/g,""); });
+    if(lb.some(Boolean)) q.set("lb", lb.join("|").replace(/\|+$/,""));
+
+    current = location.href.split(/[?#]/)[0] + "?" + q.toString().replace(/%2F/g,"/").replace(/%3A/g,":");
+    $("link").textContent = current;
+    $("test").href = current;
+
+    var when = zonedToUtc(q.get("t"), chosen.tz);
+    var p = date.split("-").map(Number);
+    var nice = new Date(Date.UTC(p[0],p[1]-1,p[2])).toLocaleDateString("en-GB",{timeZone:"UTC",weekday:"long",day:"numeric",month:"long",year:"numeric"});
+    if(time){ var hm=time.split(":").map(Number); nice += " at " + (h12 ? ((hm[0]%12)||12)+":"+pad(hm[1])+(hm[0]>=12?" PM":" AM") : time); }
+    else nice += " (start of the day)";
+    $("summary").textContent = nice + " · " + chosen.label + " " + offset(chosen.tz) + (when < Date.now() ? " · This date has passed" : "");
+
+    clearTimeout(frameTimer);
+    frameTimer = setTimeout(function(){
+      var fr=$("preview").querySelector("iframe");
+      if(!fr){ fr=document.createElement("iframe"); fr.title="Countdown preview"; $("preview").appendChild(fr); }
+      if(fr.getAttribute("src")!==current) fr.setAttribute("src", current);
+      $("previewEmpty").hidden=true;
+    }, 250);
+  }
+
+  $("copy").addEventListener("click", function(){
+    var status=$("status");
+    if(!current){ status.textContent="Choose the wedding date first."; status.className="status error"; return; }
+    function done(){ status.textContent="Copied. Now paste it into Canva."; status.className="status"; }
+    function manual(){
+      var r=document.createRange(); r.selectNodeContents($("link"));
+      var sl=window.getSelection(); sl.removeAllRanges(); sl.addRange(r);
+      try{ if(document.execCommand("copy")){ done(); return; } }catch(e){}
+      status.textContent="Link selected — press Ctrl+C (or ⌘+C) to copy."; status.className="status";
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(current).then(done, manual);
+    else manual();
+  });
+
+  document.querySelectorAll("#f input:not(#tzSearch), #f select").forEach(function(el){
+    el.addEventListener("input", build); el.addEventListener("change", build);
+  });
+  build();
+})();
+</script>
+</body>
+</html>
